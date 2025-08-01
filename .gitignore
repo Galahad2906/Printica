@@ -1,0 +1,43 @@
+# 📦 Node modules y build
+node_modules/
+dist/
+.vercel/
+out/
+
+# 🔐 Archivos de entorno
+.env
+.env.*        # Ej: .env.local, .env.production
+
+# 🖥️ Configuración de editores
+.vscode/
+.idea/
+
+# 🖱️ Archivos del sistema operativo
+.DS_Store      # macOS
+Thumbs.db      # Windows
+
+# 🪵 Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 🗂️ Archivos temporales
+*.log
+*.tmp
+*.swp
+*.lock-wscript
+
+# 🔥 Firebase emuladores y caché
+.firebase/
+.firebaserc
+
+# 🚀 Archivos de Vercel
+.vercel/
+
+# ⚡ Build de Swiper/otros assets temporales
+*.cache
+
+# 🛠️ Otros
+*.local
+coverage/       # Reportes de tests

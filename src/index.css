@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ Fix: Evitar scroll horizontal en mobile */
+body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  background-color: #ffffff; /* Fondo base blanco para Printica */
+  color: #1f2937; /* Texto gris oscuro (accesible) */
+}
+
+/* ✅ Scroll suave para navegación por anclas */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 🎯 Mejora: Optimizar el renderizado de fuentes */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Poppins', sans-serif; /* Fuente principal de Printica */
+}
+
+/* 🔘 Botones principales (Printica) */
+.btn-printica {
+  @apply bg-printica-primary text-white font-semibold px-4 py-2 rounded-md shadow-md transition-colors duration-300;
+}
+
+.btn-printica:hover {
+  @apply bg-printica-secondary;
+}
+
+/* 🔘 Botones secundarios */
+.btn-secondary-printica {
+  @apply bg-printica-accent1 text-white font-medium px-4 py-2 rounded-md transition-colors duration-300;
+}
+
+.btn-secondary-printica:hover {
+  @apply bg-printica-deep;
+}
+
+/* 🛒 Botón "Agregar al carrito" */
+.btn-add-cart {
+  @apply bg-printica-primary text-white font-bold px-4 py-2 rounded-md shadow hover:bg-printica-secondary transition-transform transform hover:scale-105;
+}
+
+/* Loader de pantalla completa */
+.loader-fullscreen {
+  @apply flex items-center justify-center min-h-screen bg-white;
+}

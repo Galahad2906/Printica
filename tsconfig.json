@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                           // Soporte para últimas características de JS
+    "useDefineForClassFields": true,              // Campos de clase con sintaxis moderna
+    "module": "ESNext",                           // Módulos ES modernos
+    "moduleResolution": "Node",                   // Resolución estilo Node.js
+    "strict": true,                               // Modo estricto completo
+    "jsx": "react-jsx",                           // JSX transform para React 17+
+    "esModuleInterop": true,                      // Compatibilidad con CommonJS (import por default)
+    "skipLibCheck": true,                         // Ignora chequeo de tipos en libs externas
+    "forceConsistentCasingInFileNames": true,     // Evita errores en sistemas case-sensitive
+    "baseUrl": "src",                             // ✅ Imports absolutos desde "src"
+    "resolveJsonModule": true,                    // Permite importar archivos JSON como módulos
+    "allowSyntheticDefaultImports": true,         // Permite imports default sin configuración extra
+    "isolatedModules": true,                      // Mejora compatibilidad con herramientas como Vite
+    "noImplicitAny": true,                        // Exige tipado explícito, evita errores ocultos
+    "noUnusedLocals": true,                       // Advierte sobre variables locales no usadas
+    "noUnusedParameters": true,                   // Advierte sobre parámetros no utilizados
+    "noFallthroughCasesInSwitch": true            // Previene errores en sentencias switch
+  },
+  "include": ["src"],                             // Solo analiza código fuente en "src"
+  "exclude": ["node_modules", "dist"]            // Excluye dependencias y build final
+}
