@@ -1,97 +1,112 @@
-# 🎨 Printica
+# 🎨 Printica  
 
-**Sitio web moderno, profesional y accesible para Printica** – marca creativa paraguaya especializada en artículos personalizados, diseño gráfico y soluciones visuales para regalos únicos, marcas y eventos.
+**Sitio web moderno, profesional y accesible para Printica** – marca creativa paraguaya especializada en artículos personalizados, diseño gráfico y soluciones visuales para regalos únicos, marcas y eventos.  
 
-![Printica Preview](https://printica.vercel.app/og-image.jpg)
+![Printica Preview](https://printica.vercel.app/og-image.jpg)  
 
 ---
 
 ## 📑 Índice
-- [🧠 ¿Qué es Printica?](#-qué-es-printica)
-- [🔗 Sitio en línea](#-sitio-en-línea)
-- [🛠️ Tecnologías utilizadas](#️-tecnologías-utilizadas)
-- [✨ Funcionalidades destacadas](#-funcionalidades-destacadas)
-- [🛍️ E-commerce en desarrollo](#️-e-commerce-en-desarrollo)
-- [🔐 Autenticación](#-autenticación)
-- [👨‍💻 Desarrollador](#-desarrollador)
-- [📝 Licencia](#-licencia)
+- [🧠 ¿Qué es Printica?](#-qué-es-printica)  
+- [🔗 Sitio en línea](#-sitio-en-línea)  
+- [🛠️ Tecnologías utilizadas](#️-tecnologías-utilizadas)  
+- [✨ Funcionalidades destacadas](#-funcionalidades-destacadas)  
+- [🛍️ Panel Admin y E-commerce](#️-panel-admin-y-e-commerce)  
+- [🔐 Autenticación y seguridad](#-autenticación-y-seguridad)  
+- [🚀 Optimización y rendimiento](#-optimización-y-rendimiento)  
+- [👨‍💻 Desarrollador](#-desarrollador)  
+- [📝 Licencia](#-licencia)  
 
 ---
 
-## 🧠 ¿Qué es Printica?
+## 🧠 ¿Qué es Printica?  
 
-Printica nace en Encarnación con la misión de crear artículos personalizados que inmortalicen momentos especiales. Combinamos creatividad, estilo y tecnología para ofrecer productos como choperas, cuadros QR, regalos corporativos y branding visual para emprendedores.
+**Printica** nace en Encarnación con la misión de crear artículos personalizados que inmortalicen momentos especiales. Combinamos **creatividad, estilo y tecnología** para ofrecer:  
+- 🎁 Regalos únicos y personalizados  
+- 🖼️ Cuadros y afiches QR  
+- 🏢 Branding visual para marcas y emprendedores  
+- 🎨 Productos diseñados con atención a cada detalle  
 
----
-
-## 🔗 Sitio en línea
-
-👉 **[printica.vercel.app](https://printica.vercel.app)**
-
-[![Deploy on Vercel](https://vercel.com/button)](https://vercel.com)
+> Enviamos a todo Paraguay, llevando diseño y personalización a cada rincón del país.  
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🔗 Sitio en línea  
 
-- ⚛️ **React + Vite + TypeScript** – arquitectura moderna, rápida y escalable  
-- 💨 **Tailwind CSS** – diseño responsive y personalización visual eficiente  
-- 🧩 **React Icons** – íconos accesibles y consistentes  
-- 🎞️ **AOS (Animate On Scroll)** – animaciones suaves y progresivas  
-- 🖼️ **SwiperJS** – carrusel profesional para testimonios  
-- 🔥 **Firebase** – base de datos, autenticación y almacenamiento  
-- 🚀 **Vercel** – deploy automático desde GitHub, rápido y seguro  
+👉 **[printica.vercel.app](https://printica.vercel.app)**  
+
+[![Deploy on Vercel](https://vercel.com/button)](https://vercel.com)  
 
 ---
 
-## ✨ Funcionalidades destacadas
+## 🛠️ Tecnologías utilizadas  
 
-- 🌟 **Loader inicial animado** para una experiencia visual fluida  
-- 🛍️ **Catálogo visual de productos** con filtros dinámicos  
-- 🧩 **Botón flotante de WhatsApp** con integración al carrito  
-- 🧠 **Servicios visuales** con diseño intuitivo y animaciones suaves  
+- ⚛️ **React + Vite + TypeScript** → Arquitectura moderna y escalable  
+- 💨 **Tailwind CSS** → Diseño responsive rápido y personalizable  
+- 🧩 **React Icons** → Íconos accesibles y consistentes  
+- 🎞️ **Framer Motion & AOS** → Animaciones fluidas y microinteracciones  
+- 🖼️ **SwiperJS** → Carrusel profesional para testimonios  
+- 🔥 **Firebase** → Base de datos en tiempo real, Auth y Storage  
+- 🚀 **Vercel** → Deploy continuo integrado con GitHub  
+
+---
+
+## ✨ Funcionalidades destacadas  
+
+- 🚀 **Loader inicial animado** para transiciones suaves  
+- 🛍️ **Catálogo de productos dinámico** con filtros por categoría y destacados  
+- 🧾 **Carrito integrado con WhatsApp**, persistente en LocalStorage  
+- 🖥️ **Panel administrativo seguro (CRUD)** para productos, testimonios y secciones editables  
 - 🗣️ **Testimonios reales** cargados dinámicamente desde Firebase  
-- 🧑‍🎨 **Sección “Sobre Nosotros”** editable desde el panel admin  
-- 💬 **Formulario de contacto inteligente** vinculado a WhatsApp  
-- 🔒 **Panel de administración seguro** con CRUD y control de contenido  
-- 🎛️ **Filtros y control dinámico** directamente desde Firebase  
-- 📱 Totalmente **responsive**, optimizado para móviles, tablets y escritorio  
-- 🔜 Preparado para escalar a **e-commerce completo**  
+- 📱 **Responsive total**: optimizado para móviles, tablets y escritorio  
+- 🔧 **SEO y Open Graph integrados** (Meta Tags, Twitter Cards y OG Image)  
 
 ---
 
-## 🛍️ E-commerce en desarrollo
+## 🛍️ Panel Admin y E-commerce  
 
-El panel admin permite:
-- ➕ **Agregar, editar y eliminar productos**  
-- ⭐ Controlar productos destacados  
-- 🖼️ Administrar testimonios y secciones dinámicas  
-- ☁️ Subir imágenes con Firebase Storage  
+Desde el panel de administración se puede:  
+- ➕ Agregar, editar y eliminar productos  
+- ⭐ Destacar productos en portada  
+- 🖼️ Administrar testimonios de clientes  
+- ✍️ Editar la sección “Sobre Printica” y el banner principal  
 
-### Próximas funcionalidades:
-- 🛒 **Carrito persistente con LocalStorage**  
+### 🔜 Próximas funciones:  
+- 🛒 **Historial de pedidos** guardado en el navegador  
 - 🧾 **Checkout validado con resumen previo**  
-- 📱 Inclusión de datos del comprador en pedidos vía WhatsApp  
-- 💳 Integración futura con métodos de pago reales  
+- 📱 **Datos del comprador integrados en pedidos vía WhatsApp**  
+- 💳 Integración futura con pagos online  
 
 ---
 
-## 🔐 Autenticación
+## 🔐 Autenticación y seguridad  
 
-Acceso al panel protegido con **Firebase Auth**, incluyendo persistencia local de sesión para una administración fluida.
+- 🔑 Acceso protegido al panel admin con **Firebase Auth**  
+- 💾 Sesión persistente en navegador para gestión fluida  
+- 🛡️ Control de permisos para administración segura  
 
 ---
 
-## 👨‍💻 Desarrollador
+## 🚀 Optimización y rendimiento  
+
+- 🖼️ Imágenes con `lazy-loading` y `decoding="async"`  
+- 🧭 Scroll suave con `scroll-behavior`  
+- ⚡ Divisiones de código (lazy loading) en secciones secundarias  
+- 🎯 Mejora de Core Web Vitals con carga diferida y cache en Vercel  
+- 🔎 Preparado para **PWA (offline e instalación como app)** en futuras mejoras  
+
+---
+
+## 👨‍💻 Desarrollador  
 
 Creado con ❤️ por **Guillermo Zaracho Zayas**  
-📲 Contacto: [WhatsApp](https://wa.me/595972166248)
+📲 Contacto: [WhatsApp](https://wa.me/595972166248)  
 
 ---
 
-## 📝 Licencia
+## 📝 Licencia  
 
 Este proyecto es de uso exclusivo para **Printica**.  
-Todos los derechos reservados © 2025.
+Todos los derechos reservados © 2025.  
 
 ---

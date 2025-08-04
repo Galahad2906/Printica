@@ -2,40 +2,35 @@
 
 import Productos from '../components/Productos'
 import Servicios from '../components/Servicios'
-import Testimonios from '../components/Testimonios'
 import SobreNosotros from '../components/SobreNosotros'
+import Testimonios from '../components/Testimonios'
 import Contacto from '../components/Contacto'
-// 🔄 Futuro: Importar Banner dinámico si está implementado
-// import Banner from '../components/Banner'
 
 const Home = () => {
   return (
     <main role="main" aria-label="Página principal de Printica">
-      {/* Banner dinámico (opcional) */}
-      {/* <Banner /> */}
-
-      {/* Catálogo de Productos */}
-      <section id="productos" aria-label="Catálogo de productos">
+      {/* 🛍 Catálogo de Productos */}
+      <section id="productos" aria-labelledby="titulo-productos">
         <Productos />
       </section>
 
-      {/* Servicios */}
-      <section id="servicios" aria-label="Servicios de Printica">
+      {/* 🎨 Servicios */}
+      <section id="servicios" aria-labelledby="titulo-servicios">
         <Servicios />
       </section>
 
-      {/* Testimonios */}
-      <section id="testimonios" aria-label="Opiniones de clientes">
-        <Testimonios />
-      </section>
-
-      {/* Sobre Nosotros */}
-      <section id="sobre-nosotros" aria-label="Información sobre Printica">
+      {/* 🏢 Sobre Nosotros */}
+      <section id="sobre" aria-labelledby="titulo-sobre">
         <SobreNosotros />
       </section>
 
-      {/* Contacto */}
-      <section id="contacto" aria-label="Formulario de contacto">
+      {/* 💬 Testimonios */}
+      <section id="testimonios" aria-labelledby="titulo-testimonios">
+        <Testimonios />
+      </section>
+
+      {/* 📩 Contacto */}
+      <section id="contacto" aria-labelledby="titulo-contacto">
         <Contacto />
       </section>
     </main>

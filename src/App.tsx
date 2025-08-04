@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from './firebase'
@@ -14,11 +14,6 @@ import RutaPrivada from './components/ProtectedRoute'
 import Loader from './components/Loader'
 import CarritoFlotante from './components/CarritoFlotante'
 import Home from './pages/Home'
-
-// ✅ Lazy load de secciones secundarias
-const Servicios = lazy(() => import('./components/Servicios'))
-const SobreNosotros = lazy(() => import('./components/SobreNosotros'))
-const Testimonios = lazy(() => import('./components/Testimonios'))
 
 function App() {
   const [cargando, setCargando] = useState(true)
@@ -92,19 +87,7 @@ function App() {
 
       {/* Rutas principales */}
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Home />
-              <Suspense fallback={<Loader />}>
-                <Servicios />
-                <SobreNosotros />
-                <Testimonios />
-              </Suspense>
-            </>
-          }
-        />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/admin"
