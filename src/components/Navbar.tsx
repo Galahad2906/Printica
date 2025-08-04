@@ -13,27 +13,33 @@ const Navbar = () => {
       className="bg-printica-primary w-full py-4 px-4 sm:px-6 shadow-md fixed top-0 left-0 z-50"
       role="navigation"
       aria-label="Navegación principal de Printica"
-      data-aos="fade-down"
     >
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Logo */}
-        <a href="#inicio" aria-label="Ir al inicio de Printica" className="flex items-center gap-2">
-          <img 
-            src={logo} 
-            alt="Logo de Printica" 
+        <a
+          href="#inicio"
+          aria-label="Ir al inicio de Printica"
+          className="flex items-center gap-2 transition-transform duration-200 hover:scale-105"
+        >
+          <img
+            src={logo}
+            alt="Logo de Printica"
             className="h-10 w-auto"
-            loading="lazy"
+            width={120}
+            height={40}
+            loading="eager" 
+            decoding="async"
           />
         </a>
 
         {/* Enlaces */}
-        <ul className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-white font-semibold text-sm sm:text-base font-sans">
+        <ul className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-white font-semibold text-sm sm:text-base">
           {enlaces.map(({ href, texto }) => (
             <li key={href}>
               <a
                 href={href}
                 aria-label={`Ir a la sección ${texto}`}
-                className="hover:text-printica-accent2 transition-colors duration-300 relative group"
+                className="relative group transition-colors duration-300 hover:text-printica-accent2"
               >
                 {texto}
                 {/* Subrayado animado */}

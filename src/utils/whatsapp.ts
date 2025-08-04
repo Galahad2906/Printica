@@ -7,15 +7,13 @@ import type { ProductoCarrito } from '../types/index'
  * @param nombre - Nombre del cliente
  * @param productos - Array de productos en el carrito
  * @param total - Total acumulado
- * @param telefono - (opcional) Teléfono del cliente
- * @param direccion - (opcional) Dirección de entrega
+ * @param direccion - Dirección de entrega (opcional)
  * @returns string con el mensaje completo
  */
 export function generarMensajeWhatsApp(
   nombre: string,
   productos: ProductoCarrito[],
   total: number,
-  telefono?: string,
   direccion?: string
 ): string {
   const saludo = `👋 ¡Hola Printica! Soy *${nombre}* y quiero hacer el siguiente pedido:\n`
@@ -28,10 +26,7 @@ export function generarMensajeWhatsApp(
     .join('\n')
 
   const resumen = `\n\n🧾 *Total:* Gs. ${total.toLocaleString()}`
-  const datosExtra =
-    (telefono || direccion)
-      ? `\n\n📱 Teléfono: ${telefono || 'No especificado'}\n📍 Dirección: ${direccion || 'No especificada'}`
-      : ''
+  const datosExtra = direccion ? `\n\n📍 *Dirección:* ${direccion}` : ''
 
   return `${saludo}\n${lista}${resumen}${datosExtra}\n\n✅ Pedido generado desde *Printica Web*.`
 }

@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { collection, getDocs } from 'firebase/firestore'
@@ -16,7 +18,7 @@ import Loader from './components/Loader'
 import CarritoFlotante from './components/CarritoFlotante'
 
 import Home from './pages/Home' // Página principal
-import type { Producto } from './types'
+import { CarritoProvider } from './context/CarritoContext' // ✅ Importar el proveedor del carrito
 
 function App() {
   const [cargando, setCargando] = useState(true)
@@ -53,65 +55,67 @@ function App() {
   if (cargando) return <Loader />
 
   return (
-    <div className="overflow-x-hidden font-sans bg-white text-gray-900">
-      {/* Banner superior con imagen */}
-      {banner?.activo && bannerImagen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full"
-        >
-          {bannerEnlace ? (
-            <a href={bannerEnlace} target="_blank" rel="noopener noreferrer">
+    <CarritoProvider>
+      <div className="overflow-x-hidden font-sans bg-white text-gray-900">
+        {/* Banner superior con imagen */}
+        {banner?.activo && bannerImagen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full"
+          >
+            {bannerEnlace ? (
+              <a href={bannerEnlace} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={bannerImagen}
+                  alt="Imagen promocional de Printica"
+                  className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow hover:opacity-90 transition-opacity rounded-none sm:rounded-md"
+                  loading="lazy"
+                />
+              </a>
+            ) : (
               <img
                 src={bannerImagen}
                 alt="Imagen promocional de Printica"
-                className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow hover:opacity-90 transition-opacity rounded-none sm:rounded-md"
+                className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow rounded-none sm:rounded-md"
                 loading="lazy"
               />
-            </a>
-          ) : (
-            <img
-              src={bannerImagen}
-              alt="Imagen promocional de Printica"
-              className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow rounded-none sm:rounded-md"
-              loading="lazy"
-            />
-          )}
-        </motion.div>
-      )}
+            )}
+          </motion.div>
+        )}
 
-      {/* Mensaje textual del banner */}
-      {banner?.activo && banner.mensaje && (
-        <div className="bg-printica-accent2 text-printica-deep text-center py-2 font-medium shadow">
-          {banner.mensaje}
-        </div>
-      )}
+        {/* Mensaje textual del banner */}
+        {banner?.activo && banner.mensaje && (
+          <div className="bg-printica-accent2 text-printica-deep text-center py-2 font-medium shadow">
+            {banner.mensaje}
+          </div>
+        )}
 
-      {/* Navbar */}
-      <Navbar />
+        {/* Navbar */}
+        <Navbar />
 
-      {/* Rutas principales */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/admin"
-          element={
-            <RutaPrivada>
-              <AdminPanel />
-            </RutaPrivada>
-          }
-        />
-      </Routes>
+        {/* Rutas principales */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin"
+            element={
+              <RutaPrivada>
+                <AdminPanel />
+              </RutaPrivada>
+            }
+          />
+        </Routes>
 
-      {/* Carrito flotante */}
-      <CarritoFlotante />
+        {/* Carrito flotante */}
+        <CarritoFlotante />
 
-      {/* Footer */}
-      <Footer />
-    </div>
+        {/* Footer */}
+        <Footer />
+      </div>
+    </CarritoProvider>
   )
 }
 

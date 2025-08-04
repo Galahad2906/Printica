@@ -1,7 +1,7 @@
 // src/context/CarritoContext.tsx
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import type { ProductoCarrito } from '../types/index'
+import type { ProductoCarrito } from '../types'
 
 type CarritoContextType = {
   carrito: ProductoCarrito[]
@@ -14,11 +14,20 @@ type CarritoContextType = {
 const CarritoContext = createContext<CarritoContextType | undefined>(undefined)
 
 export const CarritoProvider = ({ children }: { children: ReactNode }) => {
-  const [carrito, setCarrito] = useState<ProductoCarrito[]>(() => {
-    // 🔄 Recuperar carrito desde localStorage al inicio
+  const [carrito, setCarrito] = useState<ProductoCarrito[]>([])
+
+  // 🔄 Recuperar carrito desde localStorage al montar el componente
+  useEffect(() => {
     const carritoGuardado = localStorage.getItem('printica_carrito')
-    return carritoGuardado ? JSON.parse(carritoGuardado) : []
-  })
+    if (carritoGuardado) {
+      try {
+        setCarrito(JSON.parse(carritoGuardado))
+      } catch (error) {
+        console.error('Error al parsear carrito desde localStorage:', error)
+        setCarrito([])
+      }
+    }
+  }, [])
 
   // 📝 Guardar carrito en localStorage cuando cambie
   useEffect(() => {
@@ -42,18 +51,17 @@ export const CarritoProvider = ({ children }: { children: ReactNode }) => {
   const quitar = (id: string) => {
     setCarrito(prev =>
       prev
-        .map(p =>
-          p.id === id ? { ...p, cantidad: p.cantidad - 1 } : p
-        )
+        .map(p => (p.id === id ? { ...p, cantidad: p.cantidad - 1 } : p))
         .filter(p => p.cantidad > 0)
     )
   }
 
   const limpiar = () => {
     setCarrito([])
+    localStorage.removeItem('printica_carrito') // 🧹 Limpieza explícita
   }
 
-  const total = carrito.reduce((acc, prod) => acc + prod.precio * prod.cantidad, 0)
+  const total = carrito.reduce((acc, prod) => acc + (prod.precio || 0) * prod.cantidad, 0)
 
   return (
     <CarritoContext.Provider value={{ carrito, agregar, quitar, limpiar, total }}>

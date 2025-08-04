@@ -11,7 +11,7 @@
     <meta name="author" content="Guillermo Zaracho Zayas" />
     <meta name="robots" content="index, follow" />
 
-    <!-- ✅ Open Graph (WhatsApp, Facebook, etc.) -->
+    <!-- ✅ Open Graph -->
     <meta property="og:title" content="Printica - Regalos personalizados, diseño gráfico y productos creativos" />
     <meta property="og:description" content="Artículos únicos y diseño gráfico con estilo y creatividad." />
     <meta property="og:url" content="https://printica.vercel.app" />
@@ -29,11 +29,12 @@
     <meta name="theme-color" content="#FD3D00" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- ✅ Ícono del sitio -->
+    <!-- ✅ Íconos -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- ✅ Fuente Poppins -->
+    <!-- ✅ Fuente Poppins con Preload -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLDz8Z11lFcA.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -41,7 +42,11 @@
       rel="stylesheet"
     />
 
-    <!-- ✅ Accesibilidad: idioma y viewport -->
+    <!-- ✅ Preload de imágenes críticas -->
+    <link rel="preload" as="image" href="/og-image.jpg" />
+    <link rel="preload" as="image" href="/banner-principal.jpg" />
+
+    <!-- ✅ Accesibilidad -->
     <meta http-equiv="Content-Language" content="es" />
   </head>
   <body aria-label="Aplicación web de Printica">

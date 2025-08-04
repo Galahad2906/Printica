@@ -1,5 +1,6 @@
 import React from 'react'
 import { FaTags, FaQrcode, FaLightbulb } from 'react-icons/fa'
+import { motion } from 'framer-motion'
 
 type Servicio = {
   icono: React.ReactElement
@@ -32,7 +33,6 @@ const Servicios = () => {
       role="region"
       aria-labelledby="titulo-servicios"
       className="py-20 px-4 sm:px-6 bg-gray-50"
-      data-aos="fade-up"
     >
       <div className="max-w-4xl mx-auto text-center mb-10">
         <h2 id="titulo-servicios" className="text-3xl font-bold text-printica-primary">
@@ -43,17 +43,20 @@ const Servicios = () => {
 
       <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 justify-center max-w-6xl mx-auto">
         {servicios.map((serv, i) => (
-          <li
+          <motion.li
             key={i}
-            className="w-full max-w-xs bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border border-gray-100"
-            data-aos="zoom-in"
-            data-aos-delay={i * 150}
+            className="w-full max-w-xs bg-white p-6 rounded-lg shadow-md text-center border border-gray-100"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.15 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)' }}
             aria-label={serv.titulo}
           >
             <div className="mb-4 flex justify-center">{serv.icono}</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">{serv.titulo}</h3>
             <p className="text-gray-600">{serv.descripcion}</p>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </section>

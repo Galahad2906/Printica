@@ -7,6 +7,8 @@ import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
+import { motion } from 'framer-motion'
+
 type Testimonio = {
   id: string
   nombre: string
@@ -23,7 +25,7 @@ const Testimonios = () => {
         const snapshot = await getDocs(collection(db, 'testimonios'))
         const datos = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as Testimonio[]
         setTestimonios(datos)
       } catch (error) {
@@ -41,14 +43,24 @@ const Testimonios = () => {
       role="region"
       aria-labelledby="titulo-testimonios"
     >
-      <h2
+      <motion.h2
         id="titulo-testimonios"
         className="text-3xl font-bold text-printica-primary mb-10"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
       >
         Lo que dicen nuestros clientes
-      </h2>
+      </motion.h2>
 
-      <div className="max-w-6xl mx-auto" data-aos="fade-up">
+      <motion.div
+        className="max-w-6xl mx-auto"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
         <Swiper
           modules={[Autoplay, Pagination]}
           spaceBetween={30}
@@ -65,25 +77,32 @@ const Testimonios = () => {
           {testimonios.map((testi, index) => (
             <SwiperSlide
               key={testi.id}
-              className="mb-6"
               aria-label={`Testimonio de ${testi.nombre}`}
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
             >
-              <div className="bg-white p-6 rounded-xl shadow-md max-w-sm mx-auto border border-gray-100 hover:shadow-lg transition">
+              <motion.div
+                className="bg-white p-6 rounded-xl shadow-md max-w-sm mx-auto border border-gray-100"
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                whileHover={{ scale: 1.03, boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}
+              >
                 <img
                   src={testi.avatar}
                   alt={`Foto de ${testi.nombre}`}
                   loading="lazy"
+                  decoding="async"
+                  width={80}
+                  height={80}
                   className="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-printica-accent1 object-cover"
                 />
                 <p className="italic text-gray-700 mb-3 leading-relaxed">“{testi.mensaje}”</p>
                 <p className="font-bold text-printica-deep">— {testi.nombre}</p>
-              </div>
+              </motion.div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
+      </motion.div>
     </section>
   )
 }

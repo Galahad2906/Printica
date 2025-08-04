@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast as sonnerToast } from 'sonner'
 import { useCarrito } from '../context/CarritoContext'
+import { motion } from 'framer-motion'
 import type { Producto } from '../types'
 
 const Productos = () => {
@@ -89,7 +90,9 @@ const Productos = () => {
         </label>
 
         {(categoriaSeleccionada !== 'Todas' || soloDestacados) && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => {
               setCategoriaSeleccionada('Todas')
               setSoloDestacados(false)
@@ -98,7 +101,7 @@ const Productos = () => {
             className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium transition"
           >
             Limpiar filtros
-          </button>
+          </motion.button>
         )}
       </div>
 
@@ -110,11 +113,13 @@ const Productos = () => {
           </p>
         ) : (
           productosFiltrados.map((prod, i) => (
-            <div
+            <motion.div
               key={prod.id}
-              className="w-full max-w-xs border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white"
+              className="w-full max-w-xs border rounded-lg p-4 shadow-sm bg-white"
               data-aos="fade-up"
               data-aos-delay={i * 100}
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.2 }}
             >
               <img
                 src={prod.imagen}
@@ -129,28 +134,33 @@ const Productos = () => {
               <p className="text-printica-primary font-bold mt-2">
                 Gs. {prod.precio?.toLocaleString()}
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   agregar({ ...prod, cantidad: 1 })
                   mostrarToast('Producto agregado al carrito')
                 }}
-                className="mt-3 w-full bg-printica-primary hover:bg-printica-secondary text-white py-2 px-4 rounded transition-colors duration-300 font-semibold"
+                className="mt-3 w-full bg-printica-primary hover:bg-printica-secondary text-white py-2 px-4 rounded font-semibold transition-colors duration-300"
               >
                 Agregar al carrito
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))
         )}
       </div>
 
       {/* Toast simple */}
       {toast && (
-        <div
-          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-printica-primary text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 z-50"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-printica-primary text-white px-4 py-2 rounded shadow-lg z-50"
           role="alert"
         >
           {toast}
-        </div>
+        </motion.div>
       )}
     </section>
   )
