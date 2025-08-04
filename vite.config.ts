@@ -1,4 +1,3 @@
-// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -19,7 +18,22 @@ export default defineConfig({
     port: 4173,    // 🔧 Puerto para vista previa de build
   },
   build: {
-    sourcemap: true,       // 🐞 Útil para debug en producción
-    chunkSizeWarningLimit: 1000, // ⚡ Evita warnings con bundles grandes
+    sourcemap: false, // 🚀 Desactivado en producción para reducir tamaño
+    chunkSizeWarningLimit: 800, // ⚡ Ajustado para evitar warnings innecesarios
+    cssCodeSplit: true, // ✅ Divide el CSS por componente para mejor cache
+    minify: 'esbuild', // ⚡ Usa esbuild (más rápido que terser por defecto)
+    target: 'es2017', // 🎯 Reduce JS legacy innecesario en navegadores modernos
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
+          swiper: ['swiper'],
+        },
+      },
+    },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'firebase/app'], // ✅ Pre-bundling de deps clave
   },
 })

@@ -1,13 +1,10 @@
-// src/App.tsx
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from './firebase'
 import { toast } from 'react-hot-toast'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import { motion } from 'framer-motion'
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -16,9 +13,12 @@ import AdminPanel from './components/admin/AdminPanel'
 import RutaPrivada from './components/ProtectedRoute'
 import Loader from './components/Loader'
 import CarritoFlotante from './components/CarritoFlotante'
+import Home from './pages/Home'
 
-import Home from './pages/Home' // Página principal
-import { CarritoProvider } from './context/CarritoContext' // ✅ Importar el proveedor del carrito
+// ✅ Lazy load de secciones secundarias
+const Servicios = lazy(() => import('./components/Servicios'))
+const SobreNosotros = lazy(() => import('./components/SobreNosotros'))
+const Testimonios = lazy(() => import('./components/Testimonios'))
 
 function App() {
   const [cargando, setCargando] = useState(true)
@@ -48,74 +48,80 @@ function App() {
         setCargando(false)
       }
     }
-
     fetchBanner()
   }, [])
 
   if (cargando) return <Loader />
 
   return (
-    <CarritoProvider>
-      <div className="overflow-x-hidden font-sans bg-white text-gray-900">
-        {/* Banner superior con imagen */}
-        {banner?.activo && bannerImagen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full"
-          >
-            {bannerEnlace ? (
-              <a href={bannerEnlace} target="_blank" rel="noopener noreferrer">
-                <img
-                  src={bannerImagen}
-                  alt="Imagen promocional de Printica"
-                  className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow hover:opacity-90 transition-opacity rounded-none sm:rounded-md"
-                  loading="lazy"
-                />
-              </a>
-            ) : (
+    <div className="overflow-x-hidden font-sans bg-white text-gray-900">
+      {/* Banner superior con imagen */}
+      {banner?.activo && bannerImagen && (
+        <div className="w-full">
+          {bannerEnlace ? (
+            <a href={bannerEnlace} target="_blank" rel="noopener noreferrer">
               <img
                 src={bannerImagen}
                 alt="Imagen promocional de Printica"
-                className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow rounded-none sm:rounded-md"
-                loading="lazy"
+                className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow hover:opacity-90 transition-opacity rounded-none sm:rounded-md"
+                loading="eager"
+                decoding="async"
               />
-            )}
-          </motion.div>
-        )}
+            </a>
+          ) : (
+            <img
+              src={bannerImagen}
+              alt="Imagen promocional de Printica"
+              className="w-full h-auto max-h-64 sm:max-h-80 object-cover shadow rounded-none sm:rounded-md"
+              loading="eager"
+              decoding="async"
+            />
+          )}
+        </div>
+      )}
 
-        {/* Mensaje textual del banner */}
-        {banner?.activo && banner.mensaje && (
-          <div className="bg-printica-accent2 text-printica-deep text-center py-2 font-medium shadow">
-            {banner.mensaje}
-          </div>
-        )}
+      {/* Mensaje textual del banner */}
+      {banner?.activo && banner.mensaje && (
+        <div className="bg-printica-accent2 text-printica-deep text-center py-2 font-medium shadow">
+          {banner.mensaje}
+        </div>
+      )}
 
-        {/* Navbar */}
-        <Navbar />
+      {/* Navbar */}
+      <Navbar />
 
-        {/* Rutas principales */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin"
-            element={
-              <RutaPrivada>
-                <AdminPanel />
-              </RutaPrivada>
-            }
-          />
-        </Routes>
+      {/* Rutas principales */}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Home />
+              <Suspense fallback={<Loader />}>
+                <Servicios />
+                <SobreNosotros />
+                <Testimonios />
+              </Suspense>
+            </>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin"
+          element={
+            <RutaPrivada>
+              <AdminPanel />
+            </RutaPrivada>
+          }
+        />
+      </Routes>
 
-        {/* Carrito flotante */}
-        <CarritoFlotante />
+      {/* Carrito flotante */}
+      <CarritoFlotante />
 
-        {/* Footer */}
-        <Footer />
-      </div>
-    </CarritoProvider>
+      {/* Footer */}
+      <Footer />
+    </div>
   )
 }
 
