@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Producto } from '../../types'
 import { motion } from 'framer-motion'
 
@@ -16,101 +17,133 @@ const ProductList = ({
   setPaginaActual,
   productosPorPagina,
   handleEliminar,
-  handleEditar
+  handleEditar,
 }: Props) => {
-  const totalPaginas = Math.ceil(productos.length / productosPorPagina)
+  const [busqueda, setBusqueda] = useState('')
+
+  // 🔎 Filtrar productos por búsqueda
+  const productosFiltrados = productos.filter((p) =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.categoria.toLowerCase().includes(busqueda.toLowerCase())
+  )
+
+  // 📄 Paginación
+  const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina)
   const indexUltimo = paginaActual * productosPorPagina
   const indexPrimero = indexUltimo - productosPorPagina
-  const productosVisibles = productos.slice(indexPrimero, indexUltimo)
+  const productosVisibles = productosFiltrados.slice(indexPrimero, indexUltimo)
 
   return (
-    <>
-      {/* 📋 Listado de productos */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
-        {productosVisibles.map((producto) => (
-          <motion.div
-            key={producto.id}
-            className="bg-white shadow-md rounded-xl p-4 relative border border-gray-200 hover:shadow-lg transition-shadow"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="w-full h-40 object-cover rounded-lg mb-4 border"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  'https://via.placeholder.com/300x200?text=Imagen+no+disponible'
-              }}
-            />
-            <h2 className="text-lg font-semibold text-printica-primary">{producto.nombre}</h2>
-            <p className="text-sm text-gray-600">{producto.descripcion}</p>
-            <p className="text-sm text-gray-800 mt-1 font-semibold">💲 {producto.precio}</p>
-            <p className="text-sm text-gray-500">📦 {producto.categoria}</p>
-
-            {producto.destacado && (
-              <span className="inline-block mt-2 text-xs text-white bg-printica-primary px-2 py-1 rounded-full shadow">
-                ⭐ Destacado
-              </span>
-            )}
-
-            {/* Botones editar/eliminar */}
-            <div className="absolute top-2 right-2 flex gap-2">
-              <button
-                onClick={() => handleEliminar(producto.id)}
-                className="text-red-500 hover:text-red-700 text-xl"
-                title="Eliminar"
-              >
-                ❌
-              </button>
-              <motion.button
-                onClick={() => handleEditar(producto)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-printica-primary hover:text-printica-secondary text-xl"
-                title="Editar"
-              >
-                ✏️
-              </motion.button>
-            </div>
-          </motion.div>
-        ))}
+    <section>
+      {/* 🔍 Barra de búsqueda */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <h3 className="text-xl font-semibold text-printica-primary">
+          Lista de productos ({productosFiltrados.length})
+        </h3>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o categoría..."
+          value={busqueda}
+          onChange={(e) => {
+            setBusqueda(e.target.value)
+            setPaginaActual(1) // Reiniciar paginación al buscar
+          }}
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-printica-accent1 w-full sm:w-64"
+        />
       </div>
+
+      {/* 📋 Listado de productos */}
+      {productosVisibles.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+          {productosVisibles.map((producto) => (
+            <motion.div
+              key={producto.id}
+              className="bg-white shadow-md rounded-xl p-4 relative border border-gray-200 hover:shadow-lg transition-shadow"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <img
+                src={producto.imagen}
+                alt={producto.nombre}
+                className="w-full h-40 object-cover rounded-lg mb-4 border"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    'https://via.placeholder.com/300x200?text=Imagen+no+disponible'
+                }}
+              />
+              <h2 className="text-lg font-semibold text-printica-primary truncate">{producto.nombre}</h2>
+              <p className="text-sm text-gray-600 line-clamp-2">{producto.descripcion}</p>
+              <p className="text-sm text-gray-800 mt-1 font-semibold">💲 {producto.precio.toLocaleString()} Gs.</p>
+              <p className="text-xs text-gray-500">📦 {producto.categoria}</p>
+
+              {producto.destacado && (
+                <span className="inline-block mt-2 text-xs text-white bg-printica-primary px-2 py-1 rounded-full shadow">
+                  ⭐ Destacado
+                </span>
+              )}
+
+              {/* Botones editar/eliminar */}
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button
+                  onClick={() => handleEliminar(producto.id)}
+                  className="text-red-500 hover:text-red-700 text-xl"
+                  title="Eliminar producto"
+                >
+                  ❌
+                </button>
+                <motion.button
+                  onClick={() => handleEditar(producto)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-printica-primary hover:text-printica-secondary text-xl"
+                  title="Editar producto"
+                >
+                  ✏️
+                </motion.button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-500 mt-6">No se encontraron productos.</p>
+      )}
 
       {/* 📄 Paginación */}
-      <div className="flex justify-center mt-8 gap-2 flex-wrap items-center">
-        {paginaActual > 1 && (
-          <button
-            onClick={() => setPaginaActual(paginaActual - 1)}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-          >
-            ← Anterior
-          </button>
-        )}
-        {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((pagina) => (
-          <button
-            key={pagina}
-            onClick={() => setPaginaActual(pagina)}
-            className={`px-3 py-1 rounded transition-colors ${
-              pagina === paginaActual
-                ? 'bg-printica-primary text-white font-bold'
-                : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            {pagina}
-          </button>
-        ))}
-        {paginaActual < totalPaginas && (
-          <button
-            onClick={() => setPaginaActual(paginaActual + 1)}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-          >
-            Siguiente →
-          </button>
-        )}
-      </div>
-    </>
+      {totalPaginas > 1 && (
+        <div className="flex justify-center mt-8 gap-2 flex-wrap items-center">
+          {paginaActual > 1 && (
+            <button
+              onClick={() => setPaginaActual(paginaActual - 1)}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              ← Anterior
+            </button>
+          )}
+          {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((pagina) => (
+            <button
+              key={pagina}
+              onClick={() => setPaginaActual(pagina)}
+              className={`px-3 py-1 rounded transition-colors ${
+                pagina === paginaActual
+                  ? 'bg-printica-primary text-white font-bold'
+                  : 'bg-gray-200 hover:bg-gray-300'
+              }`}
+            >
+              {pagina}
+            </button>
+          ))}
+          {paginaActual < totalPaginas && (
+            <button
+              onClick={() => setPaginaActual(paginaActual + 1)}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Siguiente →
+            </button>
+          )}
+        </div>
+      )}
+    </section>
   )
 }
 

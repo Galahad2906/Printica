@@ -1,6 +1,7 @@
 import { BannerData } from '../../types'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import { FC } from 'react'
 
 type BannerManagerProps = {
   bannerData: BannerData & { enlace?: string }
@@ -8,7 +9,7 @@ type BannerManagerProps = {
   guardarBanner: () => Promise<void>
 }
 
-const BannerManager = ({ bannerData, setBannerData, guardarBanner }: BannerManagerProps) => {
+const BannerManager: FC<BannerManagerProps> = ({ bannerData, setBannerData, guardarBanner }) => {
   const { imagen, enlace, activo } = bannerData
 
   const handleGuardar = async () => {

@@ -46,7 +46,7 @@ const AdminPanel = () => {
   const [testimonioForm, setTestimonioForm] = useState<Testimonio>({
     nombre: '',
     mensaje: '',
-    avatar: ''
+    avatar: '',
   })
   const [modoEdicionTestimonio, setModoEdicionTestimonio] = useState(false)
   const [idEditandoTestimonio, setIdEditandoTestimonio] = useState<string | null>(null)
@@ -55,21 +55,18 @@ const AdminPanel = () => {
   const [bannerData, setBannerData] = useState<BannerData & { enlace?: string }>({
     imagen: '',
     enlace: '',
-    activo: false
+    activo: false,
   })
 
   // 🧾 Sobre nosotros
-  const [sobreData, setSobreData] = useState<SobreData>({
-    texto: '',
-    imagen: ''
-  })
+  const [sobreData, setSobreData] = useState<SobreData>({ texto: '', imagen: '' })
 
   // 🎨 Toast personalizado para Printica
   const toastPrintica = (mensaje: string, tipo: 'success' | 'error' = 'success') =>
     toast[tipo](mensaje, {
       icon: tipo === 'success' ? '🎉' : '⚠️',
       style: {
-        background: '#FD3D00', // Color principal de Printica
+        background: '#FD3D00',
         color: '#fff',
         fontWeight: 'bold',
         borderRadius: '8px',
@@ -78,6 +75,9 @@ const AdminPanel = () => {
       duration: 3000,
     })
 
+  // ====================
+  // 🔄 CARGA INICIAL
+  // ====================
   useEffect(() => {
     fetchProductos()
     fetchTestimonios()
@@ -85,92 +85,16 @@ const AdminPanel = () => {
     obtenerSobre()
   }, [])
 
-  // 📦 Funciones CRUD
+  // ====================
+  // 📦 CRUD PRODUCTOS
+  // ====================
   const fetchProductos = async () => {
     const snapshot = await getDocs(collection(db, 'productos'))
-    const datos = snapshot.docs.map(doc => ({
+    const datos = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...(doc.data() as Omit<Producto, 'id'>),
     }))
     setProductos(datos)
-  }
-
-  const fetchTestimonios = async () => {
-    const snap = await getDocs(collection(db, 'testimonios'))
-    const datos = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Testimonio[]
-    setTestimonios(datos)
-  }
-
-  const obtenerBanner = async () => {
-    try {
-      const ref = doc(db, 'banner', 'principal')
-      const snap = await getDoc(ref)
-      if (snap.exists()) setBannerData(snap.data() as BannerData & { enlace?: string })
-    } catch (error) {
-      console.error('Error al cargar banner:', error)
-    }
-  }
-
-  const obtenerSobre = async () => {
-    const ref = doc(db, 'config', 'sobre')
-    const snap = await getDoc(ref)
-    if (snap.exists()) setSobreData(snap.data() as SobreData)
-  }
-
-  const guardarBanner = async () => {
-    try {
-      await setDoc(doc(db, 'banner', 'principal'), bannerData)
-      toastPrintica('🎉 Banner actualizado correctamente')
-    } catch (error) {
-      console.error(error)
-      toastPrintica('❌ Error al guardar el banner', 'error')
-    }
-  }
-
-  const guardarSobre = async () => {
-    try {
-      await setDoc(doc(db, 'config', 'sobre'), sobreData)
-      toastPrintica('✅ Sección "Sobre Printica" actualizada')
-    } catch (error) {
-      console.error(error)
-      toastPrintica('❌ Error al guardar sección sobre', 'error')
-    }
-  }
-
-  const guardarTestimonio = async () => {
-    const { nombre, mensaje, avatar } = testimonioForm
-    if (!nombre || !mensaje || !avatar) {
-      toastPrintica('⚠️ Completá todos los campos de testimonio.', 'error')
-      return
-    }
-
-    try {
-      if (modoEdicionTestimonio && idEditandoTestimonio) {
-        await updateDoc(doc(db, 'testimonios', idEditandoTestimonio), { nombre, mensaje, avatar })
-        toastPrintica('✅ Testimonio actualizado')
-      } else {
-        await addDoc(collection(db, 'testimonios'), { nombre, mensaje, avatar })
-        toastPrintica('✅ Testimonio agregado')
-      }
-      setTestimonioForm({ nombre: '', mensaje: '', avatar: '' })
-      setModoEdicionTestimonio(false)
-      setIdEditandoTestimonio(null)
-      await fetchTestimonios()
-    } catch (error) {
-      console.error(error)
-      toastPrintica('❌ Error al guardar testimonio', 'error')
-    }
-  }
-
-  const eliminarTestimonio = async (id: string) => {
-    if (confirm('¿Eliminar este testimonio?')) {
-      await deleteDoc(doc(db, 'testimonios', id))
-      toastPrintica('🗑️ Testimonio eliminado')
-      await fetchTestimonios()
-    }
   }
 
   const handleEditar = (producto: Producto) => {
@@ -243,25 +167,113 @@ const AdminPanel = () => {
     await fetchProductos()
   }
 
+  // ====================
+  // 💬 CRUD TESTIMONIOS
+  // ====================
+  const fetchTestimonios = async () => {
+    const snap = await getDocs(collection(db, 'testimonios'))
+    const datos = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Testimonio[]
+    setTestimonios(datos)
+  }
+
+  const guardarTestimonio = async () => {
+    const { nombre, mensaje, avatar } = testimonioForm
+    if (!nombre || !mensaje || !avatar) {
+      toastPrintica('⚠️ Completá todos los campos de testimonio.', 'error')
+      return
+    }
+
+    try {
+      if (modoEdicionTestimonio && idEditandoTestimonio) {
+        await updateDoc(doc(db, 'testimonios', idEditandoTestimonio), { nombre, mensaje, avatar })
+        toastPrintica('✅ Testimonio actualizado')
+      } else {
+        await addDoc(collection(db, 'testimonios'), { nombre, mensaje, avatar })
+        toastPrintica('✅ Testimonio agregado')
+      }
+      setTestimonioForm({ nombre: '', mensaje: '', avatar: '' })
+      setModoEdicionTestimonio(false)
+      setIdEditandoTestimonio(null)
+      await fetchTestimonios()
+    } catch (error) {
+      console.error(error)
+      toastPrintica('❌ Error al guardar testimonio', 'error')
+    }
+  }
+
+  const eliminarTestimonio = async (id: string) => {
+    if (confirm('¿Eliminar este testimonio?')) {
+      await deleteDoc(doc(db, 'testimonios', id))
+      toastPrintica('🗑️ Testimonio eliminado')
+      await fetchTestimonios()
+    }
+  }
+
+  // ====================
+  // 🖼️ BANNER & SOBRE
+  // ====================
+  const obtenerBanner = async () => {
+    try {
+      const ref = doc(db, 'banner', 'principal')
+      const snap = await getDoc(ref)
+      if (snap.exists()) setBannerData(snap.data() as BannerData & { enlace?: string })
+    } catch (error) {
+      console.error('Error al cargar banner:', error)
+    }
+  }
+
+  const obtenerSobre = async () => {
+    const ref = doc(db, 'config', 'sobre')
+    const snap = await getDoc(ref)
+    if (snap.exists()) setSobreData(snap.data() as SobreData)
+  }
+
+  const guardarBanner = async () => {
+    try {
+      await setDoc(doc(db, 'banner', 'principal'), bannerData)
+      toastPrintica('🎉 Banner actualizado correctamente')
+    } catch (error) {
+      console.error(error)
+      toastPrintica('❌ Error al guardar el banner', 'error')
+    }
+  }
+
+  const guardarSobre = async () => {
+    try {
+      await setDoc(doc(db, 'config', 'sobre'), sobreData)
+      toastPrintica('✅ Sección "Sobre Printica" actualizada')
+    } catch (error) {
+      console.error(error)
+      toastPrintica('❌ Error al guardar sección sobre', 'error')
+    }
+  }
+
+  // ====================
+  // 🚪 LOGOUT
+  // ====================
   const handleLogout = async () => {
     await signOut(auth)
     navigate('/login')
   }
 
   return (
-    <section className="min-h-screen bg-white text-printica-primary p-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold text-printica-primary">Panel de Administración</h2>
+    <section className="min-h-screen bg-gray-50 text-printica-primary">
+      {/* HEADER */}
+      <header className="flex flex-col sm:flex-row sm:justify-between items-center p-6 bg-white shadow-md sticky top-0 z-20">
+        <h2 className="text-2xl font-bold">Panel de Administración</h2>
         <button
           onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow"
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow mt-4 sm:mt-0"
         >
           Cerrar sesión
         </button>
-      </div>
+      </header>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap justify-center gap-3 mb-8">
+      {/* TABS */}
+      <nav className="flex flex-wrap justify-center gap-3 bg-white shadow-sm py-4 sticky top-16 z-10">
         {[
           { key: 'productos', label: '🧾 Productos' },
           { key: 'testimonios', label: '💬 Testimonios' },
@@ -280,58 +292,60 @@ const AdminPanel = () => {
             {label}
           </button>
         ))}
-      </div>
+      </nav>
 
-      {/* Secciones */}
-      {tab === 'productos' && (
-        <>
-          <ProductForm
-            formData={formData}
-            setFormData={setFormData}
-            modoEdicion={modoEdicion}
-            resetForm={resetForm}
-            handleSubmit={handleSubmit}
+      {/* CONTENIDO */}
+      <main className="p-6">
+        {tab === 'productos' && (
+          <>
+            <ProductForm
+              formData={formData}
+              setFormData={setFormData}
+              modoEdicion={modoEdicion}
+              resetForm={resetForm}
+              handleSubmit={handleSubmit}
+            />
+            <ProductList
+              productos={productos}
+              paginaActual={paginaActual}
+              setPaginaActual={setPaginaActual}
+              productosPorPagina={productosPorPagina}
+              handleEliminar={handleEliminar}
+              handleEditar={handleEditar}
+            />
+          </>
+        )}
+
+        {tab === 'testimonios' && (
+          <TestimoniosManager
+            testimonios={testimonios}
+            testimonioForm={testimonioForm}
+            setTestimonioForm={setTestimonioForm}
+            modoEdicion={modoEdicionTestimonio}
+            setModoEdicion={setModoEdicionTestimonio}
+            idEditando={idEditandoTestimonio}
+            setIdEditando={setIdEditandoTestimonio}
+            guardarTestimonio={guardarTestimonio}
+            eliminarTestimonio={eliminarTestimonio}
           />
-          <ProductList
-            productos={productos}
-            paginaActual={paginaActual}
-            setPaginaActual={setPaginaActual}
-            productosPorPagina={productosPorPagina}
-            handleEliminar={handleEliminar}
-            handleEditar={handleEditar}
+        )}
+
+        {tab === 'banner' && (
+          <BannerManager
+            bannerData={bannerData}
+            setBannerData={setBannerData}
+            guardarBanner={guardarBanner}
           />
-        </>
-      )}
+        )}
 
-      {tab === 'testimonios' && (
-        <TestimoniosManager
-          testimonios={testimonios}
-          testimonioForm={testimonioForm}
-          setTestimonioForm={setTestimonioForm}
-          modoEdicion={modoEdicionTestimonio}
-          setModoEdicion={setModoEdicionTestimonio}
-          idEditando={idEditandoTestimonio}
-          setIdEditando={setIdEditandoTestimonio}
-          guardarTestimonio={guardarTestimonio}
-          eliminarTestimonio={eliminarTestimonio}
-        />
-      )}
-
-      {tab === 'banner' && (
-        <BannerManager
-          bannerData={bannerData}
-          setBannerData={setBannerData}
-          guardarBanner={guardarBanner}
-        />
-      )}
-
-      {tab === 'sobre' && (
-        <SobreEditor
-          sobreData={sobreData}
-          setSobreData={setSobreData}
-          guardarSobre={guardarSobre}
-        />
-      )}
+        {tab === 'sobre' && (
+          <SobreEditor
+            sobreData={sobreData}
+            setSobreData={setSobreData}
+            guardarSobre={guardarSobre}
+          />
+        )}
+      </main>
     </section>
   )
 }
