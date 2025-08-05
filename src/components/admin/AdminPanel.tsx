@@ -19,12 +19,13 @@ import { Producto, Testimonio, BannerData, SobreData } from 'types'
 import BannerManager from './BannerManager'
 import SobreEditor from './SobreEditor'
 import TestimoniosManager from './TestimoniosManager'
+import ServiciosManager from './ServiciosManager' // ✅ Importado nuevo componente
 import ProductForm from './ProductForm'
 import ProductList from './ProductList'
 
 const AdminPanel = () => {
   const navigate = useNavigate()
-  const [tab, setTab] = useState<'productos' | 'testimonios' | 'banner' | 'sobre'>('productos')
+  const [tab, setTab] = useState<'productos' | 'testimonios' | 'banner' | 'sobre' | 'servicios'>('productos') // ✅ Agregado "servicios"
 
   // 🛍 Productos
   const [formData, setFormData] = useState({
@@ -279,6 +280,7 @@ const AdminPanel = () => {
           { key: 'testimonios', label: '💬 Testimonios' },
           { key: 'banner', label: '📸 Banner' },
           { key: 'sobre', label: '📝 Sobre Printica' },
+          { key: 'servicios', label: '🛠 Servicios' }, // ✅ Nueva pestaña
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -344,6 +346,10 @@ const AdminPanel = () => {
             setSobreData={setSobreData}
             guardarSobre={guardarSobre}
           />
+        )}
+
+        {tab === 'servicios' && (
+          <ServiciosManager /> // ✅ Nuevo componente renderizado
         )}
       </main>
     </section>
