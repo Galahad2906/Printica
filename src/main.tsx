@@ -1,45 +1,28 @@
-// src/main.tsx
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 
 import App from './App'
-import Login from './components/admin/Login'
-import AdminPanel from './components/admin/AdminPanel'
-import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
+import { CarritoProvider } from './context/CarritoContext'
+import { Toaster } from 'sonner'
 
 import './index.css'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-import { CarritoProvider } from './context/CarritoContext'
-import { Toaster } from 'sonner'
+const root = document.getElementById('root')
+if (!root) throw new Error('No se encontró el elemento #root en index.html')
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    {/* 🛒 Contexto global del carrito */}
-    <CarritoProvider>
-      {/* 🌐 Router principal */}
-      <BrowserRouter>
-        <Routes>
-          {/* 🏠 Página principal */}
-          <Route path="/" element={<App />} />
-          {/* 🔐 Login de administrador */}
-          <Route path="/login" element={<Login />} />
-          {/* 🎛 Panel de administración protegido */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-
-      {/* 🔔 Notificaciones globales */}
-      <Toaster position="top-right" richColors />
-    </CarritoProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <CarritoProvider>
+          <App />
+          <Toaster position="top-right" richColors />
+        </CarritoProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 )

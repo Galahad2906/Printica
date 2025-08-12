@@ -1,6 +1,7 @@
+// src/components/admin/ProductList.tsx
 import { useState } from 'react'
-import { Producto } from '../../types'
 import { motion } from 'framer-motion'
+import { Producto } from 'types' // con baseUrl "src"; si no, usa: ../../types
 
 type Props = {
   productos: Producto[]
@@ -21,14 +22,17 @@ const ProductList = ({
 }: Props) => {
   const [busqueda, setBusqueda] = useState('')
 
-  // 🔎 Filtrar productos por búsqueda
-  const productosFiltrados = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.categoria.toLowerCase().includes(busqueda.toLowerCase())
-  )
+  const q = busqueda.toLowerCase().trim()
+
+  // 🔎 Filtrar productos por búsqueda (con defaults seguros)
+  const productosFiltrados = productos.filter((p) => {
+    const nombre = (p.nombre ?? '').toLowerCase()
+    const categoria = (p.categoria ?? '').toLowerCase()
+    return nombre.includes(q) || categoria.includes(q)
+  })
 
   // 📄 Paginación
-  const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina)
+  const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina) || 1
   const indexUltimo = paginaActual * productosPorPagina
   const indexPrimero = indexUltimo - productosPorPagina
   const productosVisibles = productosFiltrados.slice(indexPrimero, indexUltimo)
@@ -55,55 +59,65 @@ const ProductList = ({
       {/* 📋 Listado de productos */}
       {productosVisibles.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
-          {productosVisibles.map((producto) => (
-            <motion.div
-              key={producto.id}
-              className="bg-white shadow-md rounded-xl p-4 relative border border-gray-200 hover:shadow-lg transition-shadow"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <img
-                src={producto.imagen}
-                alt={producto.nombre}
-                className="w-full h-40 object-cover rounded-lg mb-4 border"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://via.placeholder.com/300x200?text=Imagen+no+disponible'
-                }}
-              />
-              <h2 className="text-lg font-semibold text-printica-primary truncate">{producto.nombre}</h2>
-              <p className="text-sm text-gray-600 line-clamp-2">{producto.descripcion}</p>
-              <p className="text-sm text-gray-800 mt-1 font-semibold">💲 {producto.precio.toLocaleString()} Gs.</p>
-              <p className="text-xs text-gray-500">📦 {producto.categoria}</p>
+          {productosVisibles.map((producto) => {
+            const nombre = producto.nombre ?? 'Producto'
+            const descripcion = producto.descripcion ?? ''
+            const imagen = producto.imagen ?? ''
+            const categoria = producto.categoria ?? 'Sin categoría'
+            const precio = producto.precio ?? 0
 
-              {producto.destacado && (
-                <span className="inline-block mt-2 text-xs text-white bg-printica-primary px-2 py-1 rounded-full shadow">
-                  ⭐ Destacado
-                </span>
-              )}
+            return (
+              <motion.div
+                key={producto.id}
+                className="bg-white shadow-md rounded-xl p-4 relative border border-gray-200 hover:shadow-lg transition-shadow"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <img
+                  src={imagen}
+                  alt={nombre}
+                  className="w-full h-40 object-cover rounded-lg mb-4 border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://via.placeholder.com/300x200?text=Imagen+no+disponible'
+                  }}
+                />
+                <h2 className="text-lg font-semibold text-printica-primary truncate">{nombre}</h2>
+                {descripcion && <p className="text-sm text-gray-600 line-clamp-2">{descripcion}</p>}
+                <p className="text-sm text-gray-800 mt-1 font-semibold">
+                  💲 {precio.toLocaleString()} Gs.
+                </p>
+                <p className="text-xs text-gray-500">📦 {categoria}</p>
 
-              {/* Botones editar/eliminar */}
-              <div className="absolute top-2 right-2 flex gap-2">
-                <button
-                  onClick={() => handleEliminar(producto.id)}
-                  className="text-red-500 hover:text-red-700 text-xl"
-                  title="Eliminar producto"
-                >
-                  ❌
-                </button>
-                <motion.button
-                  onClick={() => handleEditar(producto)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="text-printica-primary hover:text-printica-secondary text-xl"
-                  title="Editar producto"
-                >
-                  ✏️
-                </motion.button>
-              </div>
-            </motion.div>
-          ))}
+                {producto.destacado && (
+                  <span className="inline-block mt-2 text-xs text-white bg-printica-primary px-2 py-1 rounded-full shadow">
+                    ⭐ Destacado
+                  </span>
+                )}
+
+                {/* Botones editar/eliminar */}
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={() => handleEliminar(producto.id)}
+                    className="text-red-500 hover:text-red-700 text-xl"
+                    title="Eliminar producto"
+                  >
+                    ❌
+                  </button>
+                  <motion.button
+                    onClick={() => handleEditar(producto)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-printica-primary hover:text-printica-secondary text-xl"
+                    title="Editar producto"
+                  >
+                    ✏️
+                  </motion.button>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       ) : (
         <p className="text-center text-gray-500 mt-6">No se encontraron productos.</p>

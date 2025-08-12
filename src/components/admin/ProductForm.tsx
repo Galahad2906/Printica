@@ -1,16 +1,12 @@
+// src/components/admin/ProductForm.tsx 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import type { ProductoFormData } from '../../types'
+import { toast } from 'sonner'
 
 type Props = {
-  formData: {
-    nombre: string
-    descripcion: string
-    imagen: string
-    precio: string
-    categoria: string
-    destacado: boolean
-  }
-  setFormData: React.Dispatch<React.SetStateAction<any>>
+  formData: ProductoFormData
+  setFormData: React.Dispatch<React.SetStateAction<ProductoFormData>>
   modoEdicion: boolean
   resetForm: () => void
   handleSubmit: (e: React.FormEvent) => void
@@ -24,6 +20,15 @@ const ProductForm = ({
   handleSubmit,
 }: Props) => {
   const [imagenValida, setImagenValida] = useState(true)
+
+  const validarURL = (url: string) => {
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   return (
     <motion.form
@@ -71,6 +76,11 @@ const ProductForm = ({
             setFormData({ ...formData, imagen: e.target.value })
             setImagenValida(true)
           }}
+          onBlur={() => {
+            const ok = validarURL(formData.imagen)
+            setImagenValida(ok)
+            if (!ok) toast.error('⚠️ La URL ingresada no es válida.')
+          }}
         />
         {formData.imagen && (
           <div className="mt-3 rounded-lg overflow-hidden border border-gray-300">
@@ -80,11 +90,6 @@ const ProductForm = ({
               className="w-full h-48 object-cover"
               onError={() => setImagenValida(false)}
             />
-            {!imagenValida && (
-              <p className="text-sm text-red-600 text-center py-2">
-                ⚠️ La URL ingresada no es válida.
-              </p>
-            )}
           </div>
         )}
       </div>
@@ -96,8 +101,14 @@ const ProductForm = ({
         required
         min="0"
         className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-printica-accent1 transition"
-        value={formData.precio}
-        onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+        value={formData.precio === '' ? '' : String(formData.precio)}
+        onChange={(e) => {
+          const v = e.target.value
+          setFormData({
+            ...formData,
+            precio: v === '' ? '' : Number(v),
+          })
+        }}
       />
 
       {/* Categoría */}

@@ -1,38 +1,31 @@
 // src/firebase.ts
-import { initializeApp } from 'firebase/app'
+import { initializeApp, type FirebaseOptions } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import {
-  getAuth,
-  browserLocalPersistence,
-  setPersistence,
-} from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
-/**
- * 🔐 Configuración de Firebase para Printica
- * Si creas un nuevo proyecto de Firebase para Printica,
- * reemplaza estas credenciales con las del nuevo panel de Firebase.
- */
-const firebaseConfig = {
-  apiKey: 'AIzaSyAjQb4BLoEDm1kMbTev0Ar3jxZwOBIWGQQ',
-  authDomain: 'bambulab-b076d.firebaseapp.com', // 🔄 Cambiar si usas nuevo dominio de Auth
-  projectId: 'bambulab-b076d', // 🔄 Cambiar al nuevo projectId de Printica
-  storageBucket: 'bambulab-b076d.appspot.com',
-  messagingSenderId: '846411272044',
-  appId: '1:846411272044:web:37420103ce62a87fad6d49',
+// ⚠️ Las credenciales deben venir de .env.local (no commitear)
+// Vite expone variables con import.meta.env
+const firebaseConfig: FirebaseOptions = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-// 🔥 Inicializar Firebase
+// Validación básica para no arrancar con env faltantes
+for (const [k, v] of Object.entries(firebaseConfig)) {
+  if (!v) {
+    // Lanzamos un error descriptivo en dev; en prod caería en Sentry/console
+    throw new Error(`[Firebase] Falta variable de entorno: ${k}`)
+  }
+}
+
 const app = initializeApp(firebaseConfig)
 
-// 📦 Exportar servicios
+export const auth = getAuth(app)       // manejar persistencia en AuthProvider
 export const db = getFirestore(app)
-export const auth = getAuth(app)
-export const storage = getStorage(app) // Para subir imágenes de productos/banners
-
-// 💾 Persistencia local de sesión (mantiene login del admin)
-setPersistence(auth, browserLocalPersistence)
-  .then(() => console.log('✅ Persistencia de sesión activada'))
-  .catch((error) =>
-    console.error('❌ Error al establecer la persistencia:', error)
-  )
+export const storage = getStorage(app)
+export default app

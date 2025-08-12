@@ -1,3 +1,4 @@
+// src/components/admin/AdminPanel.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db, auth } from '../../firebase'
@@ -13,26 +14,43 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { Producto, Testimonio, BannerData, SobreData } from 'types'
+import { Producto, Testimonio, BannerData, SobreData, ProductoFormData } from 'types'
 import BannerManager from './BannerManager'
 import SobreEditor from './SobreEditor'
 import TestimoniosManager from './TestimoniosManager'
-import ServiciosManager from './ServiciosManager' // ✅ Importado nuevo componente
+import ServiciosManager from './ServiciosManager'
 import ProductForm from './ProductForm'
 import ProductList from './ProductList'
 
+// Servicios banner
+import {
+  cargarBanner,
+  guardarBanner as guardarBannerSrv,
+  migrarBannerLegacy,
+} from '../../services/banner'
+
+type Tab = 'productos' | 'testimonios' | 'banner' | 'sobre' | 'servicios'
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'productos', label: '🧾 Productos' },
+  { key: 'testimonios', label: '💬 Testimonios' },
+  { key: 'banner', label: '📸 Banner' },
+  { key: 'sobre', label: '📝 Sobre Printica' },
+  { key: 'servicios', label: '🛠 Servicios' },
+]
+
 const AdminPanel = () => {
   const navigate = useNavigate()
-  const [tab, setTab] = useState<'productos' | 'testimonios' | 'banner' | 'sobre' | 'servicios'>('productos') // ✅ Agregado "servicios"
+  const [tab, setTab] = useState<Tab>('productos')
 
-  // 🛍 Productos
-  const [formData, setFormData] = useState({
+  // 🛍 Productos (form con precio: number | '')
+  const [formData, setFormData] = useState<ProductoFormData>({
     nombre: '',
     descripcion: '',
     imagen: '',
-    precio: '',
+    precio: '', // mientras se edita
     categoria: '',
     destacado: false,
   })
@@ -45,6 +63,7 @@ const AdminPanel = () => {
   // 💬 Testimonios
   const [testimonios, setTestimonios] = useState<Testimonio[]>([])
   const [testimonioForm, setTestimonioForm] = useState<Testimonio>({
+    id: '',
     nombre: '',
     mensaje: '',
     avatar: '',
@@ -52,67 +71,83 @@ const AdminPanel = () => {
   const [modoEdicionTestimonio, setModoEdicionTestimonio] = useState(false)
   const [idEditandoTestimonio, setIdEditandoTestimonio] = useState<string | null>(null)
 
-  // 🖼️ Banner
-  const [bannerData, setBannerData] = useState<BannerData & { enlace?: string }>({
-    imagen: '',
-    enlace: '',
+  // 🖼️ Banner (nuevo shape)
+  const [bannerData, setBannerData] = useState<BannerData>({
     activo: false,
+    enlace: '',
+    mensaje: '',
+    imagenPC: '',
+    imagenTablet: '',
+    imagenMovil: '',
   })
 
   // 🧾 Sobre nosotros
   const [sobreData, setSobreData] = useState<SobreData>({ texto: '', imagen: '' })
 
-  // 🎨 Toast personalizado para Printica
+  // Toast de marca
   const toastPrintica = (mensaje: string, tipo: 'success' | 'error' = 'success') =>
-    toast[tipo](mensaje, {
-      icon: tipo === 'success' ? '🎉' : '⚠️',
-      style: {
-        background: '#FD3D00',
-        color: '#fff',
-        fontWeight: 'bold',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
-      },
+    toast[mensaje ? tipo : 'success'](mensaje || 'Operación realizada', {
       duration: 3000,
+      className: 'font-bold',
     })
 
   // ====================
   // 🔄 CARGA INICIAL
   // ====================
   useEffect(() => {
-    fetchProductos()
-    fetchTestimonios()
-    obtenerBanner()
-    obtenerSobre()
+    void (async () => {
+      try {
+        await migrarBannerLegacy()
+      } catch (e) {
+        console.error('Migración banner:', e)
+      }
+
+      try {
+        const [banner] = await Promise.all([
+          cargarBanner(),
+          fetchProductos(),
+          fetchTestimonios(),
+          obtenerSobre(),
+        ])
+        setBannerData(banner)
+      } catch (e) {
+        console.error('Carga inicial:', e)
+      }
+    })()
   }, [])
 
   // ====================
   // 📦 CRUD PRODUCTOS
   // ====================
-  const fetchProductos = async () => {
-    const snapshot = await getDocs(collection(db, 'productos'))
-    const datos = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Producto, 'id'>),
-    }))
-    setProductos(datos)
+  const fetchProductos = async (): Promise<void> => {
+    try {
+      const snapshot = await getDocs(collection(db, 'productos'))
+      const datos = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Producto, 'id'>),
+      }))
+      setProductos(datos)
+    } catch (e) {
+      console.error(e)
+      toastPrintica('Error al cargar productos', 'error')
+    }
   }
 
-  const handleEditar = (producto: Producto) => {
+  const handleEditar = (p: Producto): void => {
     setFormData({
-      nombre: producto.nombre,
-      descripcion: producto.descripcion,
-      imagen: producto.imagen,
-      precio: producto.precio.toString(),
-      categoria: producto.categoria,
-      destacado: producto.destacado,
+      nombre: p.nombre ?? '',
+      descripcion: p.descripcion ?? '',
+      imagen: p.imagen ?? '',
+      precio: typeof p.precio === 'number' ? p.precio : '', // normaliza
+      categoria: p.categoria ?? '',
+      destacado: Boolean(p.destacado),
     })
-    setProductoEditandoId(producto.id)
+    setProductoEditandoId(p.id)
     setModoEdicion(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const resetForm = () => {
+  const resetForm = (): void => {
     setFormData({
       nombre: '',
       descripcion: '',
@@ -125,22 +160,28 @@ const AdminPanel = () => {
     setProductoEditandoId(null)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     const { nombre, descripcion, imagen, precio, categoria, destacado } = formData
 
-    if (!nombre || !descripcion || !imagen || !precio || !categoria) {
+    if (!nombre || !descripcion || !imagen || categoria === '' || precio === '') {
       toastPrintica('⚠️ Completá todos los campos obligatorios.', 'error')
+      return
+    }
+
+    const precioNumber = Number(precio)
+    if (!Number.isFinite(precioNumber) || precioNumber < 0) {
+      toastPrintica('El precio debe ser un número válido mayor o igual a 0.', 'error')
       return
     }
 
     try {
       const data = {
-        nombre,
-        descripcion,
-        imagen,
-        precio: parseFloat(precio),
-        categoria,
+        nombre: nombre.trim(),
+        descripcion: descripcion.trim(),
+        imagen: imagen.trim(),
+        precio: precioNumber, // se guarda como number
+        categoria: categoria.trim(),
         destacado,
         timestamp: serverTimestamp(),
       }
@@ -161,26 +202,36 @@ const AdminPanel = () => {
     }
   }
 
-  const handleEliminar = async (id: string) => {
+  const handleEliminar = async (id: string): Promise<void> => {
     if (!window.confirm('¿Eliminar este producto?')) return
-    await deleteDoc(doc(db, 'productos', id))
-    toastPrintica('🗑️ Producto eliminado correctamente')
-    await fetchProductos()
+    try {
+      await deleteDoc(doc(db, 'productos', id))
+      toastPrintica('🗑️ Producto eliminado correctamente')
+      await fetchProductos()
+    } catch (e) {
+      console.error(e)
+      toastPrintica('❌ Error al eliminar producto', 'error')
+    }
   }
 
   // ====================
   // 💬 CRUD TESTIMONIOS
   // ====================
-  const fetchTestimonios = async () => {
-    const snap = await getDocs(collection(db, 'testimonios'))
-    const datos = snap.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Testimonio[]
-    setTestimonios(datos)
+  const fetchTestimonios = async (): Promise<void> => {
+    try {
+      const snap = await getDocs(collection(db, 'testimonios'))
+      const datos = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Testimonio, 'id'>),
+      })) as Testimonio[]
+      setTestimonios(datos)
+    } catch (e) {
+      console.error(e)
+      toastPrintica('Error al cargar testimonios', 'error')
+    }
   }
 
-  const guardarTestimonio = async () => {
+  const guardarTestimonio = async (): Promise<void> => {
     const { nombre, mensaje, avatar } = testimonioForm
     if (!nombre || !mensaje || !avatar) {
       toastPrintica('⚠️ Completá todos los campos de testimonio.', 'error')
@@ -195,7 +246,7 @@ const AdminPanel = () => {
         await addDoc(collection(db, 'testimonios'), { nombre, mensaje, avatar })
         toastPrintica('✅ Testimonio agregado')
       }
-      setTestimonioForm({ nombre: '', mensaje: '', avatar: '' })
+      setTestimonioForm({ id: '', nombre: '', mensaje: '', avatar: '' })
       setModoEdicionTestimonio(false)
       setIdEditandoTestimonio(null)
       await fetchTestimonios()
@@ -205,36 +256,48 @@ const AdminPanel = () => {
     }
   }
 
-  const eliminarTestimonio = async (id: string) => {
-    if (confirm('¿Eliminar este testimonio?')) {
+  const eliminarTestimonio = async (id: string): Promise<void> => {
+    if (!confirm('¿Eliminar este testimonio?')) return
+    try {
       await deleteDoc(doc(db, 'testimonios', id))
       toastPrintica('🗑️ Testimonio eliminado')
       await fetchTestimonios()
+    } catch (e) {
+      console.error(e)
+      toastPrintica('❌ Error al eliminar testimonio', 'error')
     }
   }
 
   // ====================
-  // 🖼️ BANNER & SOBRE
+  // 🖼️ SOBRE
   // ====================
-  const obtenerBanner = async () => {
+  const obtenerSobre = async (): Promise<void> => {
     try {
-      const ref = doc(db, 'banner', 'principal')
+      const ref = doc(db, 'config', 'sobre')
       const snap = await getDoc(ref)
-      if (snap.exists()) setBannerData(snap.data() as BannerData & { enlace?: string })
-    } catch (error) {
-      console.error('Error al cargar banner:', error)
+      if (snap.exists()) setSobreData(snap.data() as SobreData)
+    } catch (e) {
+      console.error(e)
+      toastPrintica('Error al cargar sección Sobre', 'error')
     }
   }
 
-  const obtenerSobre = async () => {
-    const ref = doc(db, 'config', 'sobre')
-    const snap = await getDoc(ref)
-    if (snap.exists()) setSobreData(snap.data() as SobreData)
+  const guardarSobre = async (): Promise<void> => {
+    try {
+      await setDoc(doc(db, 'config', 'sobre'), sobreData)
+      toastPrintica('✅ Sección "Sobre Printica" actualizada')
+    } catch (error) {
+      console.error(error)
+      toastPrintica('❌ Error al guardar sección Sobre', 'error')
+    }
   }
 
-  const guardarBanner = async () => {
+  // ====================
+  // 🖼️ BANNER (wrapper)
+  // ====================
+  const guardarBanner = async (): Promise<void> => {
     try {
-      await setDoc(doc(db, 'banner', 'principal'), bannerData)
+      await guardarBannerSrv(bannerData)
       toastPrintica('🎉 Banner actualizado correctamente')
     } catch (error) {
       console.error(error)
@@ -242,22 +305,17 @@ const AdminPanel = () => {
     }
   }
 
-  const guardarSobre = async () => {
-    try {
-      await setDoc(doc(db, 'config', 'sobre'), sobreData)
-      toastPrintica('✅ Sección "Sobre Printica" actualizada')
-    } catch (error) {
-      console.error(error)
-      toastPrintica('❌ Error al guardar sección sobre', 'error')
-    }
-  }
-
   // ====================
   // 🚪 LOGOUT
   // ====================
-  const handleLogout = async () => {
-    await signOut(auth)
-    navigate('/login')
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await signOut(auth)
+      navigate('/login')
+    } catch (e) {
+      console.error(e)
+      toastPrintica('No se pudo cerrar sesión', 'error')
+    }
   }
 
   return (
@@ -275,16 +333,10 @@ const AdminPanel = () => {
 
       {/* TABS */}
       <nav className="flex flex-wrap justify-center gap-3 bg-white shadow-sm py-4 sticky top-16 z-10">
-        {[
-          { key: 'productos', label: '🧾 Productos' },
-          { key: 'testimonios', label: '💬 Testimonios' },
-          { key: 'banner', label: '📸 Banner' },
-          { key: 'sobre', label: '📝 Sobre Printica' },
-          { key: 'servicios', label: '🛠 Servicios' }, // ✅ Nueva pestaña
-        ].map(({ key, label }) => (
+        {TABS.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setTab(key as typeof tab)}
+            onClick={() => setTab(key)}
             className={`px-4 py-2 rounded font-semibold border transition-colors duration-300 ${
               tab === key
                 ? 'bg-printica-primary text-white'
@@ -348,9 +400,7 @@ const AdminPanel = () => {
           />
         )}
 
-        {tab === 'servicios' && (
-          <ServiciosManager /> // ✅ Nuevo componente renderizado
-        )}
+        {tab === 'servicios' && <ServiciosManager />}
       </main>
     </section>
   )
