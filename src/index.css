@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ✅ Fuente global para toda la app */
+html, :root {
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+}
+
 /* ✅ Fix: Evitar scroll horizontal en mobile */
 body {
   overflow-x: hidden;
@@ -10,7 +15,6 @@ body {
   color: #1f2937; /* Texto gris oscuro (accesible) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'Poppins', sans-serif; /* Fuente principal de Printica */
 }
 
 /* ✅ Scroll suave para navegación por anclas */
