@@ -1,4 +1,4 @@
-# 🎨 Printica  
+# 🎨 Printica   
 
 **Sitio web moderno, profesional y accesible para Printica** – marca creativa paraguaya especializada en artículos personalizados, diseño gráfico y soluciones visuales para regalos únicos, marcas y eventos.  
 
@@ -12,8 +12,10 @@
 - [🛠️ Tecnologías utilizadas](#️-tecnologías-utilizadas)  
 - [✨ Funcionalidades destacadas](#-funcionalidades-destacadas)  
 - [🛍️ Panel Admin y E-commerce](#️-panel-admin-y-e-commerce)  
+- [🖼️ Sistema de banners mejorado](#️-sistema-de-banners-mejorado)  
 - [🔐 Autenticación y seguridad](#-autenticación-y-seguridad)  
 - [🚀 Optimización y rendimiento](#-optimización-y-rendimiento)  
+- [📜 Cambios recientes](#-cambios-recientes)  
 - [👨‍💻 Desarrollador](#-desarrollador)  
 - [📝 Licencia](#-licencia)  
 
@@ -46,7 +48,7 @@
 - 🧩 **React Icons** → Íconos accesibles y consistentes  
 - 🎞️ **Framer Motion & AOS** → Animaciones fluidas y microinteracciones  
 - 🖼️ **SwiperJS** → Carrusel profesional para testimonios  
-- 🔥 **Firebase** → Base de datos en tiempo real, Auth y Storage  
+- 🔥 **Firebase Firestore + Auth** → Base de datos, autenticación y reglas de seguridad  
 - 🚀 **Vercel** → Deploy continuo integrado con GitHub  
 
 ---
@@ -69,7 +71,8 @@ Desde el panel de administración se puede:
 - ➕ Agregar, editar y eliminar productos  
 - ⭐ Destacar productos en portada  
 - 🖼️ Administrar testimonios de clientes  
-- ✍️ Editar la sección “Sobre Printica” y el banner principal  
+- ✍️ Editar la sección “Sobre Printica”  
+- 🖼️ **Editar banner principal** con soporte para imagen PC, Tablet y Móvil, y enlaces personalizados  
 
 ### 🔜 Próximas funciones:  
 - 🛒 **Historial de pedidos** guardado en el navegador  
@@ -79,11 +82,22 @@ Desde el panel de administración se puede:
 
 ---
 
+## 🖼️ Sistema de banners mejorado  
+
+- 📌 **Compatibilidad con formatos antiguos y nuevos** (`/banners/principal` y `/config/banner`)  
+- 🖼️ **Fallback automático**: si Tablet o Móvil están vacíos, usan la imagen de PC  
+- 🛡️ **Reglas Firestore actualizadas** para que solo el admin autorizado pueda editarlos  
+- 🪄 **Botón en panel admin** para completar vacíos automáticamente  
+- 🔄 Sincronización entre colecciones para transición sin cortes  
+
+---
+
 ## 🔐 Autenticación y seguridad  
 
 - 🔑 Acceso protegido al panel admin con **Firebase Auth**  
+- 📧 **Whitelist por email** (`admin@bambulab.com`) para escritura en Firestore  
 - 💾 Sesión persistente en navegador para gestión fluida  
-- 🛡️ Control de permisos para administración segura  
+- 🛡️ Validaciones de esquema en reglas Firestore para datos limpios  
 
 ---
 
@@ -94,6 +108,16 @@ Desde el panel de administración se puede:
 - ⚡ Divisiones de código (lazy loading) en secciones secundarias  
 - 🎯 Mejora de Core Web Vitals con carga diferida y cache en Vercel  
 - 🔎 Preparado para **PWA (offline e instalación como app)** en futuras mejoras  
+
+---
+
+## 📜 Cambios recientes  
+
+- 🔹 **PublicBanner.tsx**: soporte de fallbacks y placeholders.  
+- 🔹 **BannerManager.tsx**: autocompletado de imágenes faltantes y botón rápido.  
+- 🔹 **services/banner.ts**: guardado con prioridad en `/banners/principal` y fallback a `/config/banner`.  
+- 🔹 **Reglas Firestore**: añadida colección `/banners/{id}`, mantenida `/config/banner`, validaciones estrictas y whitelist por email.  
+- 🔹 Compatibilidad total con formatos de banner antiguos y nuevos.  
 
 ---
 
@@ -108,5 +132,3 @@ Creado con ❤️ por **Guillermo Zaracho Zayas**
 
 Este proyecto es de uso exclusivo para **Printica**.  
 Todos los derechos reservados © 2025.  
-
----
