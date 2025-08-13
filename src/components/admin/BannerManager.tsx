@@ -1,5 +1,5 @@
 // src/components/admin/BannerManager.tsx
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { BannerData } from '../../types'
@@ -12,21 +12,58 @@ type BannerManagerProps = {
 
 const BannerManager: FC<BannerManagerProps> = ({ bannerData, setBannerData, guardarBanner }) => {
   const { imagenPC, imagenTablet, imagenMovil, enlace, activo } = bannerData
+  const [isSaving, setIsSaving] = useState(false)
+
+  const normalize = () => {
+    const pc = (imagenPC || '').trim()
+    const tablet = (imagenTablet || '').trim() || pc
+    const movil = (imagenMovil || '').trim() || tablet
+    return { pc, tablet, movil }
+  }
 
   const handleGuardar = async () => {
-    if (!imagenPC) {
+    const { pc, tablet, movil } = normalize()
+
+    if (!pc) {
       toast.error('⚠️ Debes proporcionar al menos la imagen para PC')
       return
     }
-    await guardarBanner()
-    toast.success('✅ Banner actualizado correctamente')
+
+    // Asegura fallbacks antes de guardar
+    setBannerData(prev => ({
+      ...prev,
+      imagenPC: pc,
+      imagenTablet: tablet,
+      imagenMovil: movil,
+      enlace: (prev.enlace || '').trim() || undefined
+    }))
+
+    try {
+      setIsSaving(true)
+      await guardarBanner()
+      toast.success('✅ Banner actualizado correctamente')
+    } catch (e) {
+      toast.error('❌ No se pudo guardar el banner')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleImageChange = (
     field: keyof Pick<BannerData, 'imagenPC' | 'imagenTablet' | 'imagenMovil'>,
     value: string
   ) => {
-    setBannerData((prev) => ({ ...prev, [field]: value }))
+    setBannerData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const autofillVacios = () => {
+    const { pc, tablet, movil } = normalize()
+    if (!pc) {
+      toast.error('⚠️ Primero completá la imagen de PC')
+      return
+    }
+    setBannerData(prev => ({ ...prev, imagenTablet: tablet, imagenMovil: movil }))
+    toast.message('🪄 Completé Tablet y Móvil con la imagen de PC')
   }
 
   const renderImageInput = (
@@ -41,7 +78,7 @@ const BannerManager: FC<BannerManagerProps> = ({ bannerData, setBannerData, guar
       <input
         type="text"
         placeholder={`URL de la imagen (${placeholderSize})`}
-        value={value}
+        value={value || ''}
         onChange={(e) => handleImageChange(field, e.target.value)}
         className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-printica-accent1"
       />
@@ -83,6 +120,16 @@ const BannerManager: FC<BannerManagerProps> = ({ bannerData, setBannerData, guar
 
       {/* Campos de imagen */}
       {renderImageInput('Imagen para PC', 'imagenPC', imagenPC, '1600x400', '1600 x 400 px')}
+      <div className="flex items-center justify-between -mt-2 mb-4">
+        <span className="text-xs text-gray-500">Si Tablet/Móvil están vacíos, usaré la de PC al guardar.</span>
+        <button
+          type="button"
+          onClick={autofillVacios}
+          className="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 border"
+        >
+          🪄 Completar vacíos con PC
+        </button>
+      </div>
       {renderImageInput('Imagen para Tablet', 'imagenTablet', imagenTablet, '1080x400', '1080 x 400 px')}
       {renderImageInput('Imagen para Móvil', 'imagenMovil', imagenMovil, '800x400', '800 x 400 px')}
 
@@ -109,9 +156,10 @@ const BannerManager: FC<BannerManagerProps> = ({ bannerData, setBannerData, guar
       {/* Botón guardar */}
       <button
         onClick={handleGuardar}
-        className="bg-printica-primary text-white w-full py-2 rounded font-bold hover:bg-printica-secondary transition-colors duration-300"
+        disabled={isSaving}
+        className="bg-printica-primary text-white w-full py-2 rounded font-bold hover:bg-printica-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Guardar banner
+        {isSaving ? 'Guardando…' : 'Guardar banner'}
       </button>
     </section>
   )
